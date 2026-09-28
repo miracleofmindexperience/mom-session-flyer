@@ -6,7 +6,7 @@
  * (e.g. Session 1 | Session 2); a "full" row spans the width. Text shrinks
  * together until everything fits above the contact row.
  */
-import { LAYOUT as L, COLORS as C, FONTS, TEXT, TEMPLATE_DIR } from "./config.js";
+import { LAYOUT as L, COLORS as C, FONTS, TEXT, TEMPLATE_DIR, APP_URL } from "./config.js";
 import { templateName, rsvpUrl } from "./state.js";
 import { wrapText, fitFont, drawQR } from "./lib/canvas.js";
 
@@ -88,9 +88,9 @@ function blockHeight(lines, size) {
   return lines.reduce((h, l) => h + (l.gap ? lh * 0.5 : lh), 0);
 }
 
-/* Lays out all rows at one font size; returns { rows, height }. */
-function layout(ctx, rows, size) {
-  const full = L.right - L.left, colW = (full - L.columnGap) / 2;
+/* Lays out all rows at one font size, between L.left and `right`; returns { rows, height }. */
+function layout(ctx, rows, size, right) {
+  const full = right - L.left, colW = (full - L.columnGap) / 2;
   const rowGap = size * L.lineHeight * 0.5;
   let height = 0;
   const placed = rows.map(r => {
@@ -134,10 +134,20 @@ export async function drawFlyer(canvas, state) {
   const contact = contactText(state);
   const bottom = contact ? L.contactY - L.fontSize * 1.1 : L.bottom;
 
+  // QR codes: app (under the logo) and, if given, RSVP to its left.
+  const q = L.qr, rsvp = rsvpUrl(state);
+  const qrs = [];
+  if (state.showApp) qrs.push({ url: APP_URL, label: TEXT.appLabel, color: C.muted, cx: q.appCx });
+  if (rsvp) qrs.push({ url: rsvp, label: TEXT.rsvpLabel, color: C.accent,
+                       cx: state.showApp ? q.appCx - q.size - q.gap : q.appCx });
+  // The text stops short of any QR that sits left of the logo.
+  const leftmostQR = Math.min(...qrs.map(r => r.cx - q.size / 2));
+  const right = Math.min(L.right, leftmostQR - q.textGap);
+
   // largest font size at which everything fits
   const rows = buildRows(state);
-  let size = L.fontSize, lay = layout(ctx, rows, size);
-  while (L.top + lay.height > bottom && size > L.minFont) { size--; lay = layout(ctx, rows, size); }
+  let size = L.fontSize, lay = layout(ctx, rows, size, right);
+  while (L.top + lay.height > bottom && size > L.minFont) { size--; lay = layout(ctx, rows, size, right); }
 
   ctx.textBaseline = "top"; ctx.textAlign = "left";
   lay.rows.forEach(r => {
@@ -146,19 +156,17 @@ export async function drawFlyer(canvas, state) {
 
   if (contact) {
     ctx.textBaseline = "alphabetic";
-    fitFont(ctx, contact, "600", L.fontSize, F, L.right - L.left, L.minFont);
+    fitFont(ctx, contact, "600", L.fontSize, F, right - L.left, 14);
     ctx.fillStyle = C.accent;
     ctx.fillText(contact, L.left, L.contactY);
   }
 
-  const url = rsvpUrl(state);
-  if (url) {
-    const q = L.qr, x = q.cx - q.size / 2;
-    drawQR(ctx, url, x, q.top, q.size);
+  qrs.forEach(r => {
+    drawQR(ctx, r.url, r.cx - q.size / 2, q.top, q.size);
     ctx.textBaseline = "top"; ctx.textAlign = "center";
-    ctx.font = "600 19px " + F; ctx.fillStyle = C.muted;
-    ctx.fillText(TEXT.qrLabel, q.cx, q.top + q.size + 6);
+    ctx.font = "700 " + q.labelSize + "px " + F; ctx.fillStyle = r.color;
+    ctx.fillText(r.label, r.cx, q.top + q.size + 6);
     ctx.textAlign = "left";
-  }
+  });
   ctx.textBaseline = "alphabetic";
 }

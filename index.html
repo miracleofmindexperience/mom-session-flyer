@@ -6,7 +6,7 @@
 <title>MoM Session Flyer Maker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="css/styles.css?v=1">
+<link rel="stylesheet" href="css/styles.css?v=2">
 </head>
 <body>
 <div class="wrap">
@@ -69,7 +69,8 @@
         </div>
         <label for="f-rsvp">Registration / RSVP link for a QR code<input id="f-rsvp" inputmode="url" placeholder="e.g. the PRS registration link"></label>
         <p class="warn" id="rsvp-warn" hidden>This doesn't look like a link. Paste the full registration link.</p>
-        <p class="hint">Leave blank for no QR code. When filled, a QR code appears under the logo.</p>
+        <p class="hint">Leave blank for no RSVP QR code. When filled, it appears next to the app QR code.</p>
+        <label class="check"><input type="checkbox" id="f-show-app"> Show the "Get the app" QR code</label>
       </div>
 
       <button type="button" class="link-btn" id="reset">Clear the form</button>
@@ -96,14 +97,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./js/config.js": "./js/config.js?v=1",
-    "./js/state.js": "./js/state.js?v=1",
-    "./js/flyer.js": "./js/flyer.js?v=1",
-    "./js/lib/canvas.js": "./js/lib/canvas.js?v=1"
+    "./js/config.js": "./js/config.js?v=2",
+    "./js/state.js": "./js/state.js?v=2",
+    "./js/flyer.js": "./js/flyer.js?v=2",
+    "./js/lib/canvas.js": "./js/lib/canvas.js?v=2"
   }
 }
 </script>
-<script src="vendor/qrcode.js?v=1"></script>
-<script type="module" src="js/app.js?v=1"></script>
+<script src="vendor/qrcode.js?v=2"></script>
+<script type="module" src="js/app.js?v=2"></script>
 </body>
 </html>

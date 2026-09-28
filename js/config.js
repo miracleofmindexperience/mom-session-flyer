@@ -37,6 +37,10 @@ export const EVENTS = [
 
 export const TEMPLATE_DIR = "templates/";
 
+/* Miracle of Mind app download link: the same one as the PR team's official
+   app QR code (opens the App Store / Play Store on phones). */
+export const APP_URL = "https://isha.us/aj2o41.qr";
+
 /* Durations offered as suggestions (the field also accepts any text). */
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
 
@@ -53,7 +57,13 @@ export const LAYOUT = {
   columnGap: 50,
   bottom: 1978,                                   // last line must end above this
   contactY: 1958,                                 // baseline of the contact row
-  qr: { cx: 1374, top: 1806, size: 150 },         // under the logo, centered on it
+  qr: {
+    top: 1810, size: 140,     // QR codes sit in a row under the logo
+    appCx: 1374,              // app QR: centered under the logo
+    gap: 36,                  // space between the RSVP QR and the app QR
+    textGap: 34,              // space between the session text and the RSVP QR
+    labelSize: 19
+  },
   fontSize: 31,                                   // shrinks to fit, down to minFont
   minFont: 21,
   lineHeight: 1.32
@@ -75,7 +85,8 @@ export const FONTS = {
 export const TEXT = {
   session: n => "Session " + n,
   location: "Location:",
-  qrLabel: "Scan to register"
+  rsvpLabel: "Scan to register",
+  appLabel: "Get the app"
 };
 
 export const STORAGE_KEY = "mom-session-flyer-v1";
@@ -94,5 +105,6 @@ export const DEFAULTS = {
   location2: { venue: "", address: "" },
   note: "",
   contact: { link: "", phone: "", email: "" },
-  rsvp: ""
+  rsvp: "",
+  showApp: true
 };

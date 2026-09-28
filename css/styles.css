@@ -18,7 +18,7 @@
   --field:#18181B; --focus:#7FB2F5; --warn:#FFB29E; --warn-bg:#3A1F18;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Libre Franklin",system-ui,-apple-system,"Segoe UI",sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px}
 header.top{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
 .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}

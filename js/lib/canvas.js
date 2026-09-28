@@ -50,15 +50,16 @@ export function fitFont(ctx, text, weight, size, family, maxW, min) {
   return s;
 }
 
-/* Draws a QR code for text in a size×size white square. Needs vendor/qrcode.js (global `qrcode`). */
-export function drawQR(ctx, text, x, y, size) {
+/* Draws a QR code for text in a size×size square (white background, `color`
+   modules). Needs vendor/qrcode.js (global `qrcode`). */
+export function drawQR(ctx, text, x, y, size, color = "#111111") {
   const qr = window.qrcode(0, "M");
   qr.addData(text);
   qr.make();
   const n = qr.getModuleCount(), quiet = 2, cell = size / (n + quiet * 2);
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(x, y, size, size);
-  ctx.fillStyle = "#111111";
+  ctx.fillStyle = color;
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) {
     const x0 = Math.floor(x + (c + quiet) * cell), y0 = Math.floor(y + (r + quiet) * cell);
     const x1 = Math.floor(x + (c + quiet + 1) * cell), y1 = Math.floor(y + (r + quiet + 1) * cell);

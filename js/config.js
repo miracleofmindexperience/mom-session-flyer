@@ -45,48 +45,66 @@ export const APP_URL = "https://isha.us/aj2o41.qr";
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
 
 /*
- * Where the details go, in template pixels (all templates are 1545 x 2000
- * and share this layout). The template's own "Session details:" heading and
- * logo stay; everything in `clear` is painted white and redrawn.
+ * The details area, in template pixels (all templates are 1545 x 2000 and
+ * share the same white strip at the bottom). The whole strip is repainted:
+ * header, session card (+ optional RSVP panel), note, logo with app QR, and
+ * a contact band. Content inside the card shrinks (down to minScale) to fit.
  */
 export const LAYOUT = {
-  clear: { x: 150, y: 1598, w: 1080, h: 402 },   // placeholder text area
-  left: 168,                                      // text starts here
-  right: 1215,                                    // text must end before the logo
-  top: 1614,                                      // first line (top of text)
-  columnGap: 50,
-  bottom: 1978,                                   // last line must end above this
-  contactY: 1958,                                 // baseline of the contact row
-  qr: {
-    top: 1810, size: 140,     // QR codes sit in a row under the logo
-    appCx: 1374,              // app QR: centered under the logo
-    gap: 36,                  // space between the RSVP QR and the app QR
-    textGap: 34,              // space between the session text and the RSVP QR
-    labelSize: 19
+  strip: { top: 1488 },                        // white strip under the photo
+  left: 166,                                   // left edge of everything
+  contentRight: 1212,                          // right edge of header rule and card
+  header: { y: 1509, size: 21, spacing: 4 },   // "SESSION DETAILS" (y = middle)
+  card: { top: 1543, radius: 22, padX: 30, padTop: 20, padBottom: 26, colGap: 40 },
+  rsvp: { width: 188, tile: 132, qr: 112 },    // RSVP panel at the card's right end
+  note: { size: 22, gap: 16 },                 // italic note under the card
+  band: { top: 1916, textSize: 25 },           // navy contact band at the bottom
+  logo: {
+    src: { x: 1242, y: 1523, w: 265, h: 268 }, // the template's own logo
+    cx: 1350, top: 1495, width: 208            // redrawn here, a bit smaller
   },
-  fontSize: 31,                                   // shrinks to fit, down to minFont
-  minFont: 21,
-  lineHeight: 1.32
+  app: { size: 112, top: 1728, labelSize: 19, labelGap: 12 },
+  minScale: 0.74,
+  maxScale: 1.15                                // sparse cards grow a little to fill the space
+};
+
+/* Sizes inside the session card at scale 1 (shrunk together when needed). */
+export const CARD_TEXT = {
+  label: { size: 20, height: 26, after: 10, spacing: 3 },
+  date: { size: 36, height: 44, after: 8 },
+  line: { size: 24, height: 32 },              // time row
+  divider: { before: 12, after: 14 },
+  venue: { size: 24, height: 31 },
+  address: { size: 23, height: 31 },
+  iconIndent: 36
 };
 
 export const COLORS = {
-  text: "#1A1A1A",
-  label: "#111111",
-  accent: "#E1251B",   // contact row, like the PR team's filled-in example
-  muted: "#555555",
+  red: "#E1251B",
+  navy: "#1B2E4B",
+  band: "#1F3A5F",
+  text: "#2D3748",
+  gray: "#4A5568",
+  label: "#5B6B82",
+  panel: "#EEF2F7",
+  rule: "#D6DCE4",
+  dash: "#C3CDD9",
   white: "#FFFFFF"
 };
 
 export const FONTS = {
-  family: '"Libre Franklin", "Helvetica Neue", Arial, sans-serif',
-  preload: ["400 31px 'Libre Franklin'", "700 31px 'Libre Franklin'"]
+  family: '"Inter", "Helvetica Neue", Arial, sans-serif',
+  preload: ["400 24px Inter", "600 24px Inter", "700 36px Inter", "800 21px Inter", "italic 400 22px Inter"]
 };
 
 export const TEXT = {
-  session: n => "Session " + n,
-  location: "Location:",
-  rsvpLabel: "Scan to register",
-  appLabel: "Get the app"
+  header: "SESSION DETAILS",
+  session: n => n ? "SESSION " + n : "SESSION",
+  location: "LOCATION",
+  rsvp: "RSVP",
+  rsvpCaption: second => second ? ["Scan to register", "for either session"] : ["Scan to", "register"],
+  app: "GET THE APP",
+  bullet: "•"
 };
 
 export const STORAGE_KEY = "mom-session-flyer-v1";
@@ -97,7 +115,7 @@ export const DEFAULTS = {
   audience: "corporate",
   eventId: "stress",
   duration: "30 minutes",
-  s1: { date: "Sunday, October 11, 2026", time: "2:00 to 2:30 PM" },
+  s1: { date: "Sun, Oct 11, 2026", time: "2:00 to 2:30 PM" },
   location: { venue: "Main Street Library", address: "123 Main St,\nYour City, ST 12345" },
   second: false,
   s2: { date: "", time: "" },

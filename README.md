@@ -2,7 +2,7 @@
 
 A web page for Miracle of Mind session coordinators. Pick an audience (Corporate, Medical, Student, Community) and an event name, add the session details, and download a ready-to-share flyer.
 
-The flyer designs are the PR team's approved Canva templates (from the *MoM Sessions One Pager*). The page only fills in the white "Session details" area at the bottom: date, time, duration, location, an optional second session, an optional note, an optional contact row, and an optional registration QR code under the logo.
+The flyer designs are the PR team's approved Canva templates (from the *MoM Sessions One Pager*). The page redraws only the white "Session details" strip at the bottom: a session card (one or two sessions, date, time, duration, location), an optional RSVP/registration QR inside the card, an optional note, the Miracle of Mind logo with a "Get the app" QR (can be hidden), and an optional navy contact band (link, phone, email).
 
 Plain HTML/CSS/JS. No framework, no build step.
 
@@ -29,15 +29,17 @@ GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
 | Event names, which template each audience uses | `js/config.js` → `EVENTS` |
 | Audiences | `js/config.js` → `AUDIENCES` |
 | Add a new flyer design | Export page as PNG from Canva, save as JPG in `templates/`, add it to `EVENTS` |
-| Where the details sit, text size | `js/config.js` → `LAYOUT` |
-| Colors, fonts, labels ("Session 1", "Scan to register") | `js/config.js` → `COLORS`, `FONTS`, `TEXT` |
+| Where things sit in the details strip | `js/config.js` → `LAYOUT` |
+| Text sizes inside the session card | `js/config.js` → `CARD_TEXT` |
+| App download link ("Get the app" QR) | `js/config.js` → `APP_URL` |
+| Colors, fonts, labels ("SESSION DETAILS", "RSVP", "GET THE APP") | `js/config.js` → `COLORS`, `FONTS`, `TEXT` |
 | The example details a new visitor sees | `js/config.js` → `DEFAULTS` |
 | Form fields and page text | `index.html` |
 | How the details are laid out | `js/flyer.js` |
 
 ### Adding a template
 
-All current templates are 1545 × 2000 px (Canva's US Letter PNG export) and share the same details area, so `LAYOUT` works for all of them. A new template with the same "Session details" block needs no layout changes. Delete any placeholder text in the details area before exporting, or leave it: the page paints over it.
+All current templates are 1545 × 2000 px (Canva's US Letter PNG export) and share the same details area, so `LAYOUT` works for all of them. A new template with the same white strip and logo position needs no layout changes. The page repaints the whole strip, so any placeholder text there doesn't matter.
 
 ## Project layout
 

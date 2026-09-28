@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoM Session Flyer Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/styles.css?v=1">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Miracle of Mind · Session flyers</div>
+    <h1>Session Flyer Maker</h1>
+    <p class="lede">Pick your audience and event, add the session details, and download a ready-to-share flyer. The design comes from the approved Canva templates; only the details area changes.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="form" autocomplete="off">
+      <div class="step">
+        <h3><span>1</span>Audience</h3>
+        <div class="seg" id="audiences" role="radiogroup" aria-label="Audience"></div>
+      </div>
+
+      <div class="step">
+        <h3><span>2</span>Event</h3>
+        <label for="f-event">Event name<select id="f-event"></select></label>
+        <div class="prs">
+          <div><span class="prs-label">PRS "Event Name"</span><span id="prs-name"></span></div>
+          <button type="button" class="link-btn" id="prs-copy">Copy</button>
+        </div>
+        <p class="hint">Enter this exact name as the Event Name in PRS.</p>
+      </div>
+
+      <div class="step">
+        <h3><span>3</span>Session</h3>
+        <label for="f-duration">Duration<input id="f-duration" list="durations"></label>
+        <datalist id="durations"></datalist>
+        <div class="row">
+          <label for="f-s1-date">Date<input id="f-s1-date" placeholder="Sunday, October 11, 2026"></label>
+          <label for="f-s1-time">Time<input id="f-s1-time" placeholder="2:00 to 2:30 PM"></label>
+        </div>
+        <label for="f-venue">Venue<input id="f-venue" placeholder="e.g. Main Street Library"></label>
+        <label for="f-address">Address<textarea id="f-address" rows="2" placeholder="Street&#10;City, State ZIP"></textarea></label>
+
+        <label class="check"><input type="checkbox" id="f-second"> Add a second session</label>
+        <div id="second-fields" class="sub" hidden>
+          <div class="row">
+            <label for="f-s2-date">Session 2 date<input id="f-s2-date"></label>
+            <label for="f-s2-time">Session 2 time<input id="f-s2-time"></label>
+          </div>
+          <label class="check"><input type="checkbox" id="f-same-location"> Same location</label>
+          <div id="location2-fields" hidden>
+            <label for="f-venue2">Session 2 venue<input id="f-venue2"></label>
+            <label for="f-address2">Session 2 address<textarea id="f-address2" rows="2"></textarea></label>
+          </div>
+        </div>
+
+        <label for="f-note">One line about the session (optional)<input id="f-note" placeholder="e.g. Bring a friend. Chairs provided."></label>
+      </div>
+
+      <div class="step">
+        <h3><span>4</span>Contact &amp; registration (optional)</h3>
+        <label for="f-link">Website or short link<input id="f-link" placeholder="isha.co/yourcity"></label>
+        <div class="row">
+          <label for="f-phone">Phone<input id="f-phone" inputmode="tel"></label>
+          <label for="f-email">Email<input id="f-email" inputmode="email"></label>
+        </div>
+        <label for="f-rsvp">Registration / RSVP link for a QR code<input id="f-rsvp" inputmode="url" placeholder="e.g. the PRS registration link"></label>
+        <p class="warn" id="rsvp-warn" hidden>This doesn't look like a link. Paste the full registration link.</p>
+        <p class="hint">Leave blank for no QR code. When filled, a QR code appears under the logo.</p>
+      </div>
+
+      <button type="button" class="link-btn" id="reset">Clear the form</button>
+    </form>
+
+    <section class="preview" aria-label="Flyer preview">
+      <div class="frame"><img id="out" alt="Flyer preview"></div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="dl">Download flyer (PNG)</button>
+        <span class="status" id="dl-status" role="status"></span>
+      </div>
+      <p class="hint">Good for sharing digitally and for printing on US Letter.</p>
+    </section>
+  </div>
+</div>
+
+<canvas id="cv"></canvas>
+
+<!--
+  Version tag: every file below carries ?v=N so that after an update, browsers
+  load all the new files together instead of mixing them with cached old ones.
+  Run scripts/bump-version.sh before each push. Add any new js/ file to the map.
+-->
+<script type="importmap">
+{
+  "imports": {
+    "./js/config.js": "./js/config.js?v=1",
+    "./js/state.js": "./js/state.js?v=1",
+    "./js/flyer.js": "./js/flyer.js?v=1",
+    "./js/lib/canvas.js": "./js/lib/canvas.js?v=1"
+  }
+}
+</script>
+<script src="vendor/qrcode.js?v=1"></script>
+<script type="module" src="js/app.js?v=1"></script>
+</body>
+</html>

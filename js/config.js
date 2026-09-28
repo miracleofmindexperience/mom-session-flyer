@@ -62,12 +62,11 @@ export const LAYOUT = {
 };
 
 /*
- * Colors that follow the template: sampled from the photo just above the
- * white strip, keeping its hue. Lightness/saturation for each use:
+ * Colors that follow the template, sampled from the bottom of its photo:
  */
 export const THEME = {
-  sample: { top: 1380, height: 100 },
-  bandLight: 0.22, bandSat: 0.5,     // footer band (white text on it)
+  sample: { top: 1300, height: 180 },
+  bandSat: 0.8, bandContrast: 4.5,   // footer band: the photo's color, darkened just enough for white text (WCAG 4.5:1)
   inkLight: 0.2, inkSat: 0.45,       // dates, venue, RSVP QR
   panelLight: 0.95, panelSat: 0.3,   // card background
   ruleLight: 0.85                    // header rule, dividers

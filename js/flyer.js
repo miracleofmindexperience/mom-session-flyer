@@ -50,18 +50,35 @@ function hsl(r, g, b) {
 }
 const css = (h, s, l) => "hsl(" + h.toFixed(0) + " " + (s * 100).toFixed(0) + "% " + (l * 100).toFixed(0) + "%)";
 
-/* Averages the photo just above the white strip, then derives a dark shade
-   (footer band, dates, venue) and a pale tint (card). Cached per template. */
+/* HSL (h in degrees, s and l 0..1) to relative luminance, for contrast checks. */
+function luminance(h, s, l) {
+  const a = s * Math.min(l, 1 - l);
+  const f = n => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
+  const lin = v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  return 0.2126 * lin(f(0)) + 0.7152 * lin(f(8)) + 0.0722 * lin(f(4));
+}
+
+/* Averages the photo just above the white strip (skipping white text and deep
+   shadows), then derives: the footer band (the photo's own color, darkened
+   only as far as white text needs to stay readable), dark text, and a pale
+   card tint. Cached per template. */
 const themes = {};
 function theme(ctx, name, W) {
   if (themes[name]) return themes[name];
   const t = THEME.sample, d = ctx.getImageData(0, t.top, W, t.height).data;
   let r = 0, g = 0, b = 0, n = 0;
-  for (let i = 0; i < d.length; i += 16) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
-  const [h, s] = hsl(r / n, g / n, b / n);
+  for (let i = 0; i < d.length; i += 16) {
+    const l = (Math.max(d[i], d[i + 1], d[i + 2]) + Math.min(d[i], d[i + 1], d[i + 2])) / 510;
+    if (l > 0.85 || l < 0.08) continue;
+    r += d[i]; g += d[i + 1]; b += d[i + 2]; n++;
+  }
+  const [h, s, l] = n ? hsl(r / n, g / n, b / n) : [210, 0.4, 0.3];
+  const bandS = Math.min(s, THEME.bandSat);
+  let bandL = l;
+  while (bandL > 0.05 && (1.05 / (luminance(h, bandS, bandL) + 0.05)) < THEME.bandContrast) bandL -= 0.01;
   return (themes[name] = {
     ink: css(h, Math.min(s, THEME.inkSat), THEME.inkLight),
-    band: css(h, Math.min(s, THEME.bandSat), THEME.bandLight),
+    band: css(h, bandS, bandL),
     panel: css(h, Math.min(s, THEME.panelSat), THEME.panelLight),
     rule: css(h, Math.min(s, THEME.panelSat), THEME.ruleLight)
   });

@@ -19,7 +19,7 @@ const FIELDS = {
   "f-rsvp": "rsvp"
 };
 /* Checkboxes: input id -> key in state. */
-const CHECKS = { "f-second": "second", "f-same-location": "sameLocation", "f-show-app": "showApp" };
+const CHECKS = { "f-second": "second", "f-same-location": "sameLocation" };
 
 const get = path => path.split(".").reduce((o, k) => o[k], state);
 const set = (path, v) => { const ks = path.split("."), last = ks.pop(); ks.reduce((o, k) => o[k], state)[last] = v; };

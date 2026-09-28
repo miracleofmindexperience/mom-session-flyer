@@ -37,35 +37,40 @@ export const EVENTS = [
 
 export const TEMPLATE_DIR = "templates/";
 
-/* Miracle of Mind app download link: the same one as the PR team's official
-   app QR code (opens the App Store / Play Store on phones). */
-export const APP_URL = "https://isha.us/aj2o41.qr";
-
 /* Durations offered as suggestions (the field also accepts any text). */
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
 
 /*
  * The details area, in template pixels (all templates are 1545 x 2000 and
  * share the same white strip at the bottom). The whole strip is repainted:
- * header, session card (+ optional RSVP panel), note, logo with app QR, and
- * a contact band. Content inside the card shrinks (down to minScale) to fit.
+ * header, session card (+ optional RSVP panel), the one-sentence note, the
+ * logo, and a contact band. Card content scales (minScale to maxScale) to fit.
  */
 export const LAYOUT = {
   strip: { top: 1488 },                        // white strip under the photo
+  pad: 18,                                     // breathing room at the top and bottom of the white space
   left: 166,                                   // left edge of everything
-  contentRight: 1212,                          // right edge of header rule and card
-  header: { y: 1509, size: 21, spacing: 4 },   // "SESSION DETAILS" (y = middle)
-  card: { top: 1543, radius: 22, padX: 30, padTop: 20, padBottom: 26, colGap: 40 },
+  contentRight: 1205,                          // right edge of header rule and card (just left of the logo)
+  header: { size: 30, spacing: 5, after: 20 }, // "SESSION DETAILS"
+  card: { radius: 22, padX: 30, padTop: 22, padBottom: 26, colGap: 40 },
   rsvp: { width: 188, tile: 132, qr: 112 },    // RSVP panel at the card's right end
-  note: { size: 22, gap: 16 },                 // italic note under the card
-  band: { top: 1916, textSize: 25 },           // navy contact band at the bottom
-  logo: {
-    src: { x: 1242, y: 1523, w: 265, h: 268 }, // the template's own logo
-    cx: 1350, top: 1495, width: 208            // redrawn here, a bit smaller
-  },
-  app: { size: 112, top: 1728, labelSize: 19, labelGap: 12 },
+  note: { size: 23, gap: 16 },                 // one sentence about the session, under the card
+  band: { top: 1928, textSize: 25 },           // contact band at the bottom
+  logo: { src: { x: 1242, y: 1523, w: 265, h: 268 } }, // the template's own logo
   minScale: 0.74,
-  maxScale: 1.15                                // sparse cards grow a little to fill the space
+  maxScale: 1.3                                // sparse cards grow to fill the space
+};
+
+/*
+ * Colors that follow the template: sampled from the photo just above the
+ * white strip, keeping its hue. Lightness/saturation for each use:
+ */
+export const THEME = {
+  sample: { top: 1380, height: 100 },
+  bandLight: 0.22, bandSat: 0.5,     // footer band (white text on it)
+  inkLight: 0.2, inkSat: 0.45,       // dates, venue, RSVP QR
+  panelLight: 0.95, panelSat: 0.3,   // card background
+  ruleLight: 0.85                    // header rule, dividers
 };
 
 /* Sizes inside the session card at scale 1 (shrunk together when needed). */
@@ -81,20 +86,16 @@ export const CARD_TEXT = {
 
 export const COLORS = {
   red: "#E1251B",
-  navy: "#1B2E4B",
-  band: "#1F3A5F",
   text: "#2D3748",
   gray: "#4A5568",
   label: "#5B6B82",
-  panel: "#EEF2F7",
-  rule: "#D6DCE4",
   dash: "#C3CDD9",
   white: "#FFFFFF"
 };
 
 export const FONTS = {
   family: '"Inter", "Helvetica Neue", Arial, sans-serif',
-  preload: ["400 24px Inter", "600 24px Inter", "700 36px Inter", "800 21px Inter", "italic 400 22px Inter"]
+  preload: ["400 24px Inter", "600 24px Inter", "700 36px Inter", "800 30px Inter", "italic 400 23px Inter"]
 };
 
 export const TEXT = {
@@ -103,7 +104,6 @@ export const TEXT = {
   location: "LOCATION",
   rsvp: "RSVP",
   rsvpCaption: second => second ? ["Scan to register", "for either session"] : ["Scan to", "register"],
-  app: "GET THE APP",
   bullet: "•"
 };
 
@@ -123,6 +123,5 @@ export const DEFAULTS = {
   location2: { venue: "", address: "" },
   note: "",
   contact: { link: "", phone: "", email: "" },
-  rsvp: "",
-  showApp: true
+  rsvp: ""
 };

@@ -6,7 +6,7 @@
 <title>MoM Session Flyer Maker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
-<link rel="stylesheet" href="css/styles.css?v=4">
+<link rel="stylesheet" href="css/styles.css?v=7">
 </head>
 <body>
 <div class="wrap">
@@ -57,7 +57,7 @@
           </div>
         </div>
 
-        <label for="f-note">One line about the session (optional)<input id="f-note" placeholder="e.g. Bring a friend. Chairs provided."></label>
+        <label for="f-note">One sentence about the session (optional)<input id="f-note" placeholder="e.g. Guided meditation in a classroom setting."></label>
       </div>
 
       <div class="step">
@@ -69,8 +69,7 @@
         </div>
         <label for="f-rsvp">Registration / RSVP link for a QR code<input id="f-rsvp" inputmode="url" placeholder="e.g. the PRS registration link"></label>
         <p class="warn" id="rsvp-warn" hidden>This doesn't look like a link. Paste the full registration link.</p>
-        <p class="hint">Leave blank for no RSVP QR code. When filled, it appears next to the app QR code.</p>
-        <label class="check"><input type="checkbox" id="f-show-app"> Show the "Get the app" QR code</label>
+        <p class="hint">Leave blank for no QR code. When filled, a "Scan to register" QR appears in the session box.</p>
       </div>
 
       <button type="button" class="link-btn" id="reset">Clear the form</button>
@@ -97,14 +96,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./js/config.js": "./js/config.js?v=4",
-    "./js/state.js": "./js/state.js?v=4",
-    "./js/flyer.js": "./js/flyer.js?v=4",
-    "./js/lib/canvas.js": "./js/lib/canvas.js?v=4"
+    "./js/config.js": "./js/config.js?v=7",
+    "./js/state.js": "./js/state.js?v=7",
+    "./js/flyer.js": "./js/flyer.js?v=7",
+    "./js/lib/canvas.js": "./js/lib/canvas.js?v=7"
   }
 }
 </script>
-<script src="vendor/qrcode.js?v=4"></script>
-<script type="module" src="js/app.js?v=4"></script>
+<script src="vendor/qrcode.js?v=7"></script>
+<script type="module" src="js/app.js?v=7"></script>
 </body>
 </html>

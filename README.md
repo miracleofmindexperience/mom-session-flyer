@@ -2,7 +2,7 @@
 
 A web page for Miracle of Mind session coordinators. Pick an audience (Corporate, Medical, Student, Community) and an event name, add the session details, and download a ready-to-share flyer.
 
-The flyer designs are the PR team's approved Canva templates (from the *MoM Sessions One Pager*). The page redraws only the white "Session details" strip at the bottom: a session card (one or two sessions, date, time, duration, location), an optional RSVP/registration QR inside the card, an optional note, the Miracle of Mind logo with a "Get the app" QR (can be hidden), and an optional navy contact band (link, phone, email).
+The flyer designs are the PR team's approved Canva templates (from the *MoM Sessions One Pager*). The page redraws only the white "Session details" strip at the bottom: a session card (one or two sessions, date, time, duration, location), an optional RSVP/registration QR inside the card, an optional one-sentence description, the Miracle of Mind logo, and an optional contact band (city center link, phone, email). The details block and logo are centered in the white space, and the footer band and card colors follow each template's photo.
 
 Plain HTML/CSS/JS. No framework, no build step.
 
@@ -31,8 +31,8 @@ GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
 | Add a new flyer design | Export page as PNG from Canva, save as JPG in `templates/`, add it to `EVENTS` |
 | Where things sit in the details strip | `js/config.js` → `LAYOUT` |
 | Text sizes inside the session card | `js/config.js` → `CARD_TEXT` |
-| App download link ("Get the app" QR) | `js/config.js` → `APP_URL` |
-| Colors, fonts, labels ("SESSION DETAILS", "RSVP", "GET THE APP") | `js/config.js` → `COLORS`, `FONTS`, `TEXT` |
+| How template colors are derived (footer, card tint) | `js/config.js` → `THEME` |
+| Colors, fonts, labels ("SESSION DETAILS", "RSVP") | `js/config.js` → `COLORS`, `FONTS`, `TEXT` |
 | The example details a new visitor sees | `js/config.js` → `DEFAULTS` |
 | Form fields and page text | `index.html` |
 | How the details are laid out | `js/flyer.js` |

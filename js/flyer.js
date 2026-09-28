@@ -126,6 +126,12 @@ function locationItems(loc) {
   return lines;
 }
 
+/* One-line location for a row that spans the card: "Venue · street, city". */
+function placeItem(loc) {
+  const address = loc.address.split("\n").map(t => t.trim().replace(/,$/, "")).filter(Boolean).join(", ");
+  return (loc.venue.trim() || address) ? [{ type: "place", venue: loc.venue.trim(), address }] : [];
+}
+
 /* { cols: [items...], footer: items } for the form's choices. */
 function buildCard(state) {
   const d = state.duration, loc1 = locationItems(state.location);
@@ -136,7 +142,11 @@ function buildCard(state) {
     return { cols: [when, [{ type: "label", text: TEXT.location }, ...loc1]], footer: [] };
   }
   const s1 = sessionItems(TEXT.session(1), state.s1, d), s2 = sessionItems(TEXT.session(2), state.s2, d);
-  if (state.sameLocation) return { cols: [s1, s2], footer: loc1.length ? [divider, ...loc1] : [] };
+  // one shared location spans both columns under the two sessions
+  if (state.sameLocation) {
+    const place = placeItem(state.location);
+    return { cols: [s1, s2], footer: place.length ? [divider, ...place] : [] };
+  }
   const loc2 = locationItems(state.location2);
   return { cols: [[...s1, ...(loc1.length ? [divider, ...loc1] : [])], [...s2, ...(loc2.length ? [divider, ...loc2] : [])]], footer: [] };
 }
@@ -182,6 +192,26 @@ function item(ctx, it, x, y, width, k, draw) {
       const t = T.divider;
       if (draw) { ctx.fillStyle = TH.rule; ctx.fillRect(x, y + t.before * k, width, 2); }
       return (t.before + t.after) * k + 2;
+    }
+    case "place": {
+      // venue (bold) then " · " and the address on the same line when it fits;
+      // otherwise venue on its own line and the address wrapped below it
+      const tv = T.venue, ta = T.address, sep = it.venue && it.address ? "  ·  " : "";
+      font(ctx, 700, tv.size * k); const vw = ctx.measureText(it.venue).width;
+      font(ctx, 400, ta.size * k); const rest = sep + it.address, rw = ctx.measureText(rest).width;
+      const oneLine = indent + vw + rw <= width;
+      const addrLines = oneLine || !it.address ? [] : wrapText(ctx, it.address, width - indent);
+      const h = (it.venue ? tv.height : 0) * k + addrLines.length * ta.height * k || tv.height * k;
+      if (draw) {
+        const mid = y + tv.height * k / 2;
+        pinIcon(ctx, x, mid, tv.size * k);
+        ctx.textBaseline = "middle";
+        if (it.venue) { font(ctx, 700, tv.size * k); ctx.fillStyle = TH.ink; ctx.fillText(it.venue, x + indent, mid); }
+        font(ctx, 400, ta.size * k); ctx.fillStyle = C.gray;
+        if (oneLine) ctx.fillText(it.venue ? rest : it.address, x + indent + vw, mid);
+        else addrLines.forEach((ln, i) => ctx.fillText(ln, x + indent, y + ((it.venue ? tv.height : 0) + (i + 0.5) * ta.height) * k));
+      }
+      return h;
     }
     case "venue":
     case "address": {

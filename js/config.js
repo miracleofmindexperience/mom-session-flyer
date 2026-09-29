@@ -102,8 +102,7 @@ export const TEXT = {
   session: n => n ? "SESSION " + n : "SESSION",
   location: "LOCATION",
   rsvp: "RSVP",
-  rsvpCaption: second => second ? ["Scan to register", "for either session"] : ["Scan to", "register"],
-  bullet: "•"
+  rsvpCaption: second => second ? ["Scan to register", "for either session"] : ["Scan to", "register"]
 };
 
 export const STORAGE_KEY = "mom-session-flyer-v1";

@@ -274,22 +274,54 @@ function drawLogo(ctx, img, top, bottom) {
   ctx.drawImage(img, s.x, s.y, s.w, s.h, s.x, (top + bottom - s.h) / 2, s.w, s.h);
 }
 
+/* ---------- contact band ---------- */
+/* Small white line icons (size = text height), drawn with the top-left at x, y. */
+const BAND_ICONS = {
+  link(ctx, x, y, h) {
+    ctx.save(); ctx.translate(x + h / 2, y + h / 2); ctx.rotate(-Math.PI / 4);
+    const w = h * 0.5, t = h * 0.3;
+    roundRect(ctx, -w * 0.95, -t / 2, w, t, t / 2); ctx.stroke();
+    roundRect(ctx, -w * 0.05, -t / 2, w, t, t / 2); ctx.stroke();
+    ctx.restore();
+  },
+  phone(ctx, x, y, h) {
+    const w = h * 0.56;
+    roundRect(ctx, x + (h - w) / 2, y, w, h, h * 0.12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + h / 2 - h * 0.08, y + h * 0.82); ctx.lineTo(x + h / 2 + h * 0.08, y + h * 0.82); ctx.stroke();
+  },
+  email(ctx, x, y, h) {
+    const w = h * 1.1, t = h * 0.78, top = y + (h - t) / 2;
+    roundRect(ctx, x - (w - h) / 2, top, w, t, h * 0.1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - (w - h) / 2 + 2, top + 3); ctx.lineTo(x + h / 2, top + t * 0.58); ctx.lineTo(x + h - (h - w) / 2 - 2, top + 3); ctx.stroke();
+  }
+};
+
+/* The contact items centered in the band, each with its icon, separated by
+   thin dividers. items: [{ type: "link" | "phone" | "email", text }]. */
 function drawBand(ctx, items, W, H) {
-  const b = L.band;
+  const b = L.band, y = (b.top + H) / 2;
   ctx.fillStyle = TH.band; ctx.fillRect(0, b.top, W, H - b.top);
-  const sep = "   " + TEXT.bullet + "   ";
-  const maxW = W - L.left * 2;
   let size = b.textSize;
-  const measure = () => { font(ctx, 700, size); return ctx.measureText(items.join(sep)).width; };
-  while (measure() > maxW && size > 14) size--;
-  font(ctx, 700, size); ctx.textBaseline = "middle";
-  const y = (b.top + H) / 2;
-  let x = L.left;
-  items.forEach((t, i) => {
+  const layout = () => {
+    font(ctx, 600, size);
+    const icon = size * 0.95, gapIcon = size * 0.5, gapItem = size * 1.9;
+    const widths = items.map(it => icon + gapIcon + ctx.measureText(it.text).width);
+    return { icon, gapIcon, gapItem, widths, total: widths.reduce((a, w) => a + w, 0) + gapItem * (items.length - 1) };
+  };
+  let lay = layout();
+  while (lay.total > W - L.left * 2 && size > 14) { size--; lay = layout(); }
+  let x = (W - lay.total) / 2;
+  ctx.textBaseline = "middle";
+  items.forEach((it, i) => {
     if (i) {
-      ctx.fillStyle = C.red; ctx.fillText(sep, x, y); x += ctx.measureText(sep).width;
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.fillRect(x - lay.gapItem / 2 - 1, y - size * 0.55, 2, size * 1.1);
     }
-    ctx.fillStyle = C.white; ctx.fillText(t, x, y); x += ctx.measureText(t).width;
+    ctx.strokeStyle = C.white; ctx.lineWidth = Math.max(2, size * 0.09); ctx.lineCap = "round"; ctx.lineJoin = "round";
+    BAND_ICONS[it.type](ctx, x, y - lay.icon / 2, lay.icon);
+    font(ctx, 600, size); ctx.fillStyle = C.white;
+    ctx.fillText(it.text, x + lay.icon + lay.gapIcon, y);
+    x += lay.widths[i] + lay.gapItem;
   });
 }
 
@@ -304,7 +336,8 @@ export async function drawFlyer(canvas, state) {
   TH = theme(ctx, name, W);
 
   const c = state.contact;
-  const contact = [c.link, c.phone, c.email].map(t => t.trim()).filter(Boolean);
+  const contact = [["link", c.link], ["phone", c.phone], ["email", c.email]]
+    .map(([type, t]) => ({ type, text: t.trim() })).filter(it => it.text);
   const note = state.note.trim();
   const rsvp = rsvpUrl(state);
 

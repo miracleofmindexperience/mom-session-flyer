@@ -170,11 +170,9 @@ function item(ctx, it, x, y, width, k, draw) {
       return (t.height + t.after) * k;
     }
     case "date": {
-      // a long date shrinks (to 70%) to stay on one line before it wraps
-      const t = T.date, full = t.size * k;
-      let size = full;
+      // all dates in the card share one size (see cardContent)
+      const t = T.date, full = t.size * k, size = dateSize || full;
       font(ctx, 700, size);
-      while (ctx.measureText(it.text).width > width && size > full * 0.7) { size--; font(ctx, 700, size); }
       const lines = wrapText(ctx, it.text, width), lh = t.height * k * size / full;
       if (lines.length > 1) wrapped++;
       if (draw) {
@@ -243,9 +241,22 @@ function column(ctx, items, x, y, width, k, draw) {
 }
 
 /* Height of the card's content (or draws it). */
+/* Font size for every date in the card: the largest (down to 70%) at which
+   the longest date fits its column on one line, so dates in a row match. */
+let dateSize = 0;
+function sharedDateSize(ctx, card, colW, fullW, k) {
+  const full = T.date.size * k;
+  const dates = [...card.cols.flat().map(it => [it, colW]), ...card.footer.map(it => [it, fullW])].filter(([it]) => it.type === "date");
+  let size = full;
+  const fits = () => dates.every(([it, w]) => { font(ctx, 700, size); return ctx.measureText(it.text).width <= w; });
+  while (!fits() && size > full * 0.7) size--;
+  return size;
+}
+
 function cardContent(ctx, card, x, y, width, k, draw) {
   const gap = L.card.colGap;
   const colW = card.cols.length > 1 ? (width - gap) / 2 : width;
+  dateSize = sharedDateSize(ctx, card, colW, width, k);
   const colsH = Math.max(...card.cols.map((c, i) => column(ctx, c, x + i * (colW + gap), y, colW, k, draw)));
   return colsH + column(ctx, card.footer, x, y + colsH, width, k, draw);
 }
@@ -391,14 +402,20 @@ export async function drawFlyer(canvas, state) {
   const padX = cd.panel ? cd.padX : 0, padT = cd.panel ? cd.padTop : 0, padB = cd.panel ? cd.padBottom : 0;
   const innerX = cardL + padX, innerW = sessionsR - (rsvp ? cd.gapToRsvp : padX) - innerX;
   const open = !cd.panel; // no box: details, RSVP and logo sit side by side on white
-  font(ctx, 400, L.note.size, true);
-  // the note stays under the details, clear of the RSVP when there's no box
+  // the note stays under the details, clear of the RSVP when there's no box;
+  // it shrinks along with the details (never grows past its normal size)
   const noteW = open && rsvp ? sessionsR - cd.gapToRsvp - cardL : cardR - cardL;
-  const noteLines = note ? wrapText(ctx, note, noteW) : [];
-  const noteH = note ? L.note.gap + noteLines.length * L.note.size * 1.35 : 0;
+  let noteSize = L.note.size, noteLines = [], noteH = 0;
+  const layoutNote = k => {
+    noteSize = L.note.size * Math.min(1, k);
+    font(ctx, 400, noteSize, true);
+    noteLines = note ? wrapText(ctx, note, noteW) : [];
+    noteH = note ? L.note.gap * Math.min(1, k) + noteLines.length * noteSize * 1.35 : 0;
+  };
+  layoutNote(1);
   const headH = L.header.show ? L.header.size + L.header.after : 0;
   const rsvpMinH = rsvp ? rsvpBlockHeight(true) + (cd.panel ? 40 : 8) : 0;
-  const maxCardH = bottom - top - headH - noteH;
+  let maxCardH = bottom - top - headH - noteH;
 
   // largest scale at which the card fits
   const card = buildCard(state);
@@ -406,6 +423,7 @@ export async function drawFlyer(canvas, state) {
   const cardHeight = () => Math.max(contentH + (padT + padB) * k, rsvpMinH);
   for (;;) {
     wrapped = 0;
+    layoutNote(k); maxCardH = bottom - top - headH - noteH;
     contentH = cardContent(ctx, card, innerX, 0, innerW, k, false);
     // growing past normal size is only worth it if dates and times stay on one line
     const fits = open ? contentH + noteH <= bottom - top : cardHeight() <= maxCardH;
@@ -420,8 +438,8 @@ export async function drawFlyer(canvas, state) {
     const detailsTop = Math.max(top, mid - (contentH + noteH) / 2);
     cardContent(ctx, card, innerX, detailsTop, innerW, k, true);
     if (note) {
-      font(ctx, 400, L.note.size, true); ctx.fillStyle = C.gray; ctx.textBaseline = "top";
-      noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, detailsTop + contentH + L.note.gap + i * L.note.size * 1.35));
+      font(ctx, 400, noteSize, true); ctx.fillStyle = C.gray; ctx.textBaseline = "top";
+      noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, detailsTop + contentH + noteH - noteLines.length * noteSize * 1.35 + i * noteSize * 1.35));
     }
     if (rsvp) {
       // the RSVP column spans the red logo box: "RSVP" on its top edge, the caption's baseline on its bottom edge
@@ -456,8 +474,8 @@ export async function drawFlyer(canvas, state) {
   }
 
   if (note) {
-    font(ctx, 400, L.note.size, true); ctx.fillStyle = C.gray; ctx.textBaseline = "top";
-    noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, cardTop + cardH + L.note.gap + i * L.note.size * 1.35));
+    font(ctx, 400, noteSize, true); ctx.fillStyle = C.gray; ctx.textBaseline = "top";
+    noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, cardTop + cardH + noteH - noteLines.length * noteSize * 1.35 + i * noteSize * 1.35));
   }
 
   if (contact.length) drawBand(ctx, contact, W, H);

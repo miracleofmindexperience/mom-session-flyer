@@ -263,8 +263,8 @@ function rsvpBlockHeight(second) {
 /*
  * RSVP column: "RSVP", the QR code and the caption, fitted between `top`
  * (where the tops of the RSVP letters go) and `bottom` (where the caption's
- * last line sits). The QR keeps its size; the space above and below its
- * visible square is split evenly (it shrinks only if that space runs out).
+ * last line sits). The QR grows to fill the space between them, leaving
+ * r.gap above and below its visible square (and never wider than the column).
  */
 function drawRsvp(ctx, url, x, top, bottom, second) {
   const r = L.rsvp, cx = x + r.width / 2, caption = TEXT.rsvpCaption(second);
@@ -285,9 +285,8 @@ function drawRsvp(ctx, url, x, top, bottom, second) {
   // QR: the visible square is n modules; drawQR adds a 2-module white margin on each side
   const q = window.qrcode(0, "M"); q.addData(url); q.make();
   const n = q.getModuleCount(), space = captionTop - labelBase;
-  let size = r.qr;
   const visible = sz => sz * n / (n + 4);
-  if (space - visible(size) < 2 * r.minGap) size = (space - 2 * r.minGap) * (n + 4) / n;
+  const size = Math.min(space - 2 * r.gap, r.width - 16) * (n + 4) / n; // visible square fills the height (or the width)
   const gap = (space - visible(size)) / 2, margin = size * 2 / (n + 4);
   drawQR(ctx, url, cx - size / 2, labelBase + gap - margin, size, TH.ink);
 }

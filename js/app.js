@@ -101,7 +101,7 @@ function updateVisibility() {
 $("reset").addEventListener("click", () => {
   const keep = { audience: state.audience, eventId: state.eventId };
   state = Object.assign(defaultState(), keep, {
-    duration: "", s1: { date: "", time: "" }, location: { venue: "", address: "" }
+    s1: { date: "", time: "" }, location: { venue: "", address: "" }
   });
   fillForm(); changed();
 });
@@ -143,7 +143,7 @@ $("dl").addEventListener("click", async () => {
 });
 
 /* ---------- start ---------- */
-DURATIONS.forEach(d => $("durations").appendChild(new Option(d)));
+DURATIONS.forEach(d => $("f-duration").add(new Option(d)));
 renderCenters();
 fillForm();
 render();

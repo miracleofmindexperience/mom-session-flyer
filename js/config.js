@@ -52,7 +52,7 @@ export const LAYOUT = {
   left: 166,                                   // left edge of everything
   contentRight: 1205,                          // right edge of header rule and card (just left of the logo)
   header: { show: false, size: 30, spacing: 5, after: 20 }, // "SESSION DETAILS" heading + rule (off per the designer)
-  card: { panel: false, radius: 22, padX: 30, padTop: 22, padBottom: 26, colGap: 40, gapToRsvp: 34 }, // panel = tinted box behind the details (off per the designer)
+  card: { panel: false, radius: 22, padX: 30, padTop: 22, padBottom: 26, colGap: 80, gapToRsvp: 34 }, // panel = tinted box behind the details (off per the designer)
   rsvp: { width: 232, tile: 184, qr: 176 },    // RSVP panel at the right end of the details
   note: { size: 23, gap: 16 },                 // one sentence about the session, under the card
   band: { top: 1928, textSize: 25 },           // contact band at the bottom

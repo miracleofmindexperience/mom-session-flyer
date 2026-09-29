@@ -166,15 +166,18 @@ function item(ctx, it, x, y, width, k, draw) {
       return (t.height + t.after) * k;
     }
     case "date": {
-      const t = T.date;
-      font(ctx, 700, t.size * k);
-      const lines = wrapText(ctx, it.text, width);
+      // a long date shrinks (to 70%) to stay on one line before it wraps
+      const t = T.date, full = t.size * k;
+      let size = full;
+      font(ctx, 700, size);
+      while (ctx.measureText(it.text).width > width && size > full * 0.7) { size--; font(ctx, 700, size); }
+      const lines = wrapText(ctx, it.text, width), lh = t.height * k * size / full;
       if (lines.length > 1) wrapped++;
       if (draw) {
         ctx.fillStyle = TH.ink; ctx.textBaseline = "middle";
-        lines.forEach((ln, i) => ctx.fillText(ln, x, y + (i + 0.5) * t.height * k));
+        lines.forEach((ln, i) => ctx.fillText(ln, x, y + (i + 0.5) * lh));
       }
-      return (lines.length * t.height + t.after) * k;
+      return lines.length * lh + t.after * k;
     }
     case "time": {
       const t = T.line;

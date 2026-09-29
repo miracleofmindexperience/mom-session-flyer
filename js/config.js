@@ -36,6 +36,13 @@ export const EVENTS = [
 ];
 
 export const TEMPLATE_DIR = "templates/";
+/* Raise this whenever template images are replaced, so browsers fetch the new
+   files instead of cached old ones (the images keep the same names). */
+export const TEMPLATE_VERSION = 2;
+
+/* The Miracle of Mind logo, drawn on every flyer (the templates' white strip
+   is blank). Cut from the PR team's Canva export. */
+export const LOGO_SRC = "assets/mom-logo.png";
 
 /* Session durations in the dropdown (the MoM session modules); "Other" allows any text. */
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
@@ -57,7 +64,7 @@ export const LAYOUT = {
   divider: { show: false, inset: 24 },                      // thin line between the details and the logo (shorter than the logo by inset at each end)
   note: { size: 23, gap: 36 },                 // one sentence about the session, under the card
   band: { top: 1928, textSize: 25 },           // contact band at the bottom
-  logo: { src: { x: 1242, y: 1523, w: 265, h: 268 } }, // the template's own logo
+  logo: { src: { x: 1242, y: 1523, w: 265, h: 268 } }, // where the logo goes (x, size); y is centered in the white space
   minScale: 0.74,
   maxScale: 1.3                                // sparse cards grow to fill the space
 };

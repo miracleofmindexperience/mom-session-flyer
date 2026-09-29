@@ -29,7 +29,7 @@ GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
 | Event names, which template each audience uses | `js/config.js` → `EVENTS` |
 | Audiences | `js/config.js` → `AUDIENCES` |
 | City centers (link, email, registration QR link) | `js/centers.js` |
-| Add a new flyer design | Export page as PNG from Canva, save as JPG in `templates/`, add it to `EVENTS` |
+| Add or replace a flyer design | Save it as a 1545 × 2000 JPG in `templates/`, add it to `EVENTS`, and raise `TEMPLATE_VERSION` in `js/config.js` |
 | Where things sit in the details strip | `js/config.js` → `LAYOUT` |
 | Text sizes inside the session card | `js/config.js` → `CARD_TEXT` |
 | How template colors are derived (footer, card tint) | `js/config.js` → `THEME` |

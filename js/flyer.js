@@ -18,7 +18,7 @@
  * Everything inside the card scales together: it shrinks until it fits, and
  * a sparse card grows a little (up to maxScale) to fill the space.
  */
-import { LAYOUT as L, CARD_TEXT as T, COLORS as C, FONTS, TEXT, TEMPLATE_DIR, THEME } from "./config.js";
+import { LAYOUT as L, CARD_TEXT as T, COLORS as C, FONTS, TEXT, TEMPLATE_DIR, THEME, LOGO_SRC, TEMPLATE_VERSION } from "./config.js";
 import { templateName, rsvpUrl } from "./state.js";
 import { roundRect, spacedText, spacedWidth, wrapText, fitFont, drawQR } from "./lib/canvas.js";
 
@@ -33,11 +33,15 @@ function loadTemplate(name) {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = reject;
-      img.src = TEMPLATE_DIR + name + ".jpg";
+      img.src = TEMPLATE_DIR + name + ".jpg?v=" + TEMPLATE_VERSION;
     });
   }
   return images[name];
 }
+
+const logoImg = new Image();
+const logoReady = new Promise(r => { logoImg.onload = r; logoImg.onerror = r; });
+logoImg.src = LOGO_SRC;
 
 /* ---------- theme: colors taken from the template's photo ---------- */
 function hsl(r, g, b) {
@@ -291,12 +295,11 @@ function drawRsvp(ctx, url, x, top, bottom, second) {
   drawQR(ctx, url, cx - size / 2, labelBase + gap - margin, size, TH.ink);
 }
 
-/* The template's own logo, redrawn at its original size, centered vertically
-   in the white space. Returns the red box's top and bottom edges as drawn
-   (the box sits a few pixels differently inside each template's crop). */
-function drawLogo(ctx, img, top, bottom) {
+/* The Miracle of Mind logo, centered vertically in the white space. Returns
+   the red box's top and bottom edges as drawn (for lining up the RSVP). */
+function drawLogo(ctx, top, bottom) {
   const s = L.logo.src, y = (top + bottom - s.h) / 2;
-  ctx.drawImage(img, s.x, s.y, s.w, s.h, s.x, y, s.w, s.h);
+  ctx.drawImage(logoImg, s.x, y, s.w, s.h);
   const d = ctx.getImageData(s.x + s.w / 2 - 40, y, 80, s.h).data; // a strip down the middle of the box
   const red = row => { for (let i = row * 320; i < (row + 1) * 320; i += 4) if (d[i] > 180 && d[i + 1] < 100 && d[i + 2] < 100) return true; return false; };
   let t = 0, b = s.h - 1;
@@ -360,6 +363,7 @@ function drawBand(ctx, items, W, H) {
 export async function drawFlyer(canvas, state) {
   const name = templateName(state);
   const img = await loadTemplate(name);
+  await logoReady;
   const ctx = canvas.getContext("2d");
   const W = img.naturalWidth, H = img.naturalHeight;
   canvas.width = W; canvas.height = H;
@@ -378,7 +382,7 @@ export async function drawFlyer(canvas, state) {
 
   // repaint the whole white strip, then put the logo back
   ctx.fillStyle = C.white; ctx.fillRect(0, spaceTop, W, H - spaceTop);
-  const logo = drawLogo(ctx, img, spaceTop, spaceBottom);
+  const logo = drawLogo(ctx, spaceTop, spaceBottom);
 
   // card geometry
   const cardL = L.left, cardR = L.contentRight, cd = L.card;

@@ -155,7 +155,7 @@ function buildCard(state) {
 let wrapped = 0; // dates/times that needed more than one line in the last measure
 /* Each item is measured and drawn by the same function; draw=false only measures. */
 function item(ctx, it, x, y, width, k, draw) {
-  const indent = T.iconIndent * k;
+  const indent = T.icons ? T.iconIndent * k : 0;
   switch (it.type) {
     case "label": {
       const t = T.label;
@@ -182,7 +182,7 @@ function item(ctx, it, x, y, width, k, draw) {
       const lines = wrapText(ctx, it.text, width - indent);
       if (lines.length > 1) wrapped++;
       if (draw) {
-        clockIcon(ctx, x, y + t.height * k / 2, t.size * k);
+        if (T.icons) clockIcon(ctx, x, y + t.height * k / 2, t.size * k);
         ctx.fillStyle = C.text; ctx.textBaseline = "middle";
         lines.forEach((ln, i) => ctx.fillText(ln, x + indent, y + (i + 0.5) * t.height * k));
       }
@@ -204,7 +204,7 @@ function item(ctx, it, x, y, width, k, draw) {
       const h = (it.venue ? tv.height : 0) * k + addrLines.length * ta.height * k || tv.height * k;
       if (draw) {
         const mid = y + tv.height * k / 2;
-        pinIcon(ctx, x, mid, tv.size * k);
+        if (T.icons) pinIcon(ctx, x, mid, tv.size * k);
         ctx.textBaseline = "middle";
         if (it.venue) { font(ctx, 700, tv.size * k); ctx.fillStyle = TH.ink; ctx.fillText(it.venue, x + indent, mid); }
         font(ctx, 400, ta.size * k); ctx.fillStyle = C.gray;
@@ -219,7 +219,7 @@ function item(ctx, it, x, y, width, k, draw) {
       font(ctx, bold ? 700 : 400, t.size * k);
       const lines = wrapText(ctx, it.text, width - indent);
       if (draw) {
-        if (it.pin) pinIcon(ctx, x, y + t.height * k / 2, t.size * k);
+        if (it.pin && T.icons) pinIcon(ctx, x, y + t.height * k / 2, t.size * k);
         ctx.fillStyle = bold ? TH.ink : C.gray; ctx.textBaseline = "middle";
         lines.forEach((ln, i) => ctx.fillText(ln, x + indent, y + (i + 0.5) * t.height * k));
       }
@@ -352,18 +352,20 @@ export async function drawFlyer(canvas, state) {
   // card geometry
   const cardL = L.left, cardR = L.contentRight, cd = L.card;
   const sessionsR = rsvp ? cardR - L.rsvp.width : cardR;
-  const innerX = cardL + cd.padX, innerW = sessionsR - cd.padX - innerX;
+  // with the tinted box, text is inset from its edges; without it, text starts at the left margin
+  const padX = cd.panel ? cd.padX : 0, padT = cd.panel ? cd.padTop : 0, padB = cd.panel ? cd.padBottom : 0;
+  const innerX = cardL + padX, innerW = sessionsR - (rsvp ? cd.gapToRsvp : padX) - innerX;
   font(ctx, 400, L.note.size, true);
   const noteLines = note ? wrapText(ctx, note, cardR - cardL) : [];
   const noteH = note ? L.note.gap + noteLines.length * L.note.size * 1.35 : 0;
-  const headH = L.header.size + L.header.after;
-  const rsvpMinH = rsvp ? 26 + 14 + L.rsvp.tile + 16 + 2 * 24 + 40 : 0;
+  const headH = L.header.show ? L.header.size + L.header.after : 0;
+  const rsvpMinH = rsvp ? 26 + 14 + L.rsvp.tile + 16 + 2 * 24 + (cd.panel ? 40 : 8) : 0;
   const maxCardH = bottom - top - headH - noteH;
 
   // largest scale at which the card fits
   const card = buildCard(state);
   let k = L.maxScale, contentH;
-  const cardHeight = () => Math.max(contentH + (cd.padTop + cd.padBottom) * k, rsvpMinH);
+  const cardHeight = () => Math.max(contentH + (padT + padB) * k, rsvpMinH);
   for (;;) {
     wrapped = 0;
     contentH = cardContent(ctx, card, innerX, 0, innerW, k, false);
@@ -376,11 +378,13 @@ export async function drawFlyer(canvas, state) {
   // center the whole block (header, card, note) in the white space
   const blockH = headH + cardH + noteH;
   const y0 = Math.max(top, (top + bottom - blockH) / 2);
-  drawHeader(ctx, y0 + L.header.size / 2);
+  if (L.header.show) drawHeader(ctx, y0 + L.header.size / 2);
   const cardTop = y0 + headH;
 
-  ctx.fillStyle = TH.panel; roundRect(ctx, cardL, cardTop, cardR - cardL, cardH, cd.radius); ctx.fill();
-  cardContent(ctx, card, innerX, cardTop + cd.padTop * k, innerW, k, true);
+  if (cd.panel) { ctx.fillStyle = TH.panel; roundRect(ctx, cardL, cardTop, cardR - cardL, cardH, cd.radius); ctx.fill(); }
+  // without the box, short content is centered against the RSVP block
+  const contentTop = cd.panel ? cardTop + padT * k : cardTop + (cardH - contentH) / 2;
+  cardContent(ctx, card, innerX, contentTop, innerW, k, true);
 
   if (rsvp) {
     ctx.strokeStyle = C.dash; ctx.lineWidth = 2; ctx.setLineDash([7, 7]);

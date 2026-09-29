@@ -257,7 +257,7 @@ function drawHeader(ctx, y) {
 
 /* Height of the RSVP block: label, QR tile and caption. */
 function rsvpBlockHeight(second) {
-  return 26 + 14 + L.rsvp.tile + 16 + TEXT.rsvpCaption(second).length * 24;
+  return 26 + L.rsvp.labelGap + L.rsvp.tile + 16 + TEXT.rsvpCaption(second).length * 24;
 }
 
 function drawRsvp(ctx, url, x, top, height, second) {
@@ -267,7 +267,7 @@ function drawRsvp(ctx, url, x, top, height, second) {
   let y = top + (height - blockH) / 2;
   font(ctx, 800, 21); ctx.fillStyle = C.red; ctx.textBaseline = "middle";
   spacedText(ctx, TEXT.rsvp, cx, y + 13, 4, "center");
-  y += 26 + 14;
+  y += 26 + r.labelGap;
   ctx.fillStyle = C.white; roundRect(ctx, cx - r.tile / 2, y, r.tile, r.tile, 14); ctx.fill();
   drawQR(ctx, url, cx - r.qr / 2, y + (r.tile - r.qr) / 2, r.qr, TH.ink);
   y += r.tile + 16;
@@ -370,7 +370,7 @@ export async function drawFlyer(canvas, state) {
   const noteLines = note ? wrapText(ctx, note, noteW) : [];
   const noteH = note ? L.note.gap + noteLines.length * L.note.size * 1.35 : 0;
   const headH = L.header.show ? L.header.size + L.header.after : 0;
-  const rsvpMinH = rsvp ? 26 + 14 + L.rsvp.tile + 16 + 2 * 24 + (cd.panel ? 40 : 8) : 0;
+  const rsvpMinH = rsvp ? rsvpBlockHeight(true) + (cd.panel ? 40 : 8) : 0;
   const maxCardH = bottom - top - headH - noteH;
 
   // largest scale at which the card fits
@@ -401,8 +401,10 @@ export async function drawFlyer(canvas, state) {
       drawRsvp(ctx, rsvp, sessionsR, mid - rH / 2, rH, state.second);
     }
     // thin divider between the session details (incl. RSVP) and the logo
-    const g = L.logo.src, dx = (cardR + g.x) / 2, dh = g.h - 2 * L.divider.inset;
-    ctx.fillStyle = TH.rule; ctx.fillRect(dx - 1, mid - dh / 2, 2, dh);
+    if (L.divider.show) {
+      const g = L.logo.src, dx = (cardR + g.x) / 2, dh = g.h - 2 * L.divider.inset;
+      ctx.fillStyle = TH.rule; ctx.fillRect(dx - 1, mid - dh / 2, 2, dh);
+    }
     if (contact.length) drawBand(ctx, contact, W, H);
     ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
     return;

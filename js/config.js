@@ -37,7 +37,7 @@ export const EVENTS = [
 
 export const TEMPLATE_DIR = "templates/";
 
-/* Session durations offered in the dropdown (the MoM session modules). */
+/* Session durations in the dropdown (the MoM session modules); "Other" allows any text. */
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
 
 /*

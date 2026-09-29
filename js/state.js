@@ -1,4 +1,4 @@
-import { STORAGE_KEY, DEFAULTS, EVENTS, AUDIENCES, DURATIONS } from "./config.js";
+import { STORAGE_KEY, DEFAULTS, EVENTS, AUDIENCES } from "./config.js";
 
 /* Saved draft merged over the defaults, so drafts from older versions still load. */
 export function loadState() {
@@ -27,7 +27,6 @@ function merge(base, extra) {
 function normalize(s) {
   if (!AUDIENCES[s.audience]) s.audience = DEFAULTS.audience;
   if (!eventsFor(s.audience).some(e => e.id === s.eventId)) s.eventId = eventsFor(s.audience)[0].id;
-  if (!DURATIONS.includes(s.duration)) s.duration = DEFAULTS.duration; // older drafts allowed free text
   return s;
 }
 

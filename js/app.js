@@ -10,7 +10,6 @@ let state = loadState();
 
 /* Text fields: input id -> path in state. */
 const FIELDS = {
-  "f-duration": "duration",
   "f-s1-date": "s1.date", "f-s1-time": "s1.time",
   "f-venue": "location.venue", "f-address": "location.address",
   "f-s2-date": "s2.date", "f-s2-time": "s2.time",
@@ -59,6 +58,22 @@ $("prs-copy").addEventListener("click", () => {
   }, () => {});
 });
 
+/* ---------- duration: a standard choice, or "Other" with free text ---------- */
+const OTHER = "other";
+function renderDuration() {
+  const standard = DURATIONS.includes(state.duration);
+  $("f-duration").value = standard ? state.duration : OTHER;
+  $("duration-other-wrap").hidden = standard;
+  if (!standard) $("f-duration-other").value = state.duration;
+}
+$("f-duration").addEventListener("change", e => {
+  state.duration = e.target.value === OTHER ? $("f-duration-other").value : e.target.value;
+  renderDuration();
+  if (e.target.value === OTHER) $("f-duration-other").focus();
+  changed();
+});
+$("f-duration-other").addEventListener("input", e => { state.duration = e.target.value; changed(); });
+
 /* ---------- city center ---------- */
 function renderCenters() {
   const sel = $("f-center");
@@ -82,6 +97,7 @@ function fillForm() {
   Object.entries(FIELDS).forEach(([id, path]) => { $(id).value = get(path); });
   Object.entries(CHECKS).forEach(([id, key]) => { $(id).checked = state[key]; });
   $("f-center").value = state.center;
+  renderDuration();
   renderAudiences(); renderEvents(); updateVisibility();
 }
 
@@ -144,6 +160,7 @@ $("dl").addEventListener("click", async () => {
 
 /* ---------- start ---------- */
 DURATIONS.forEach(d => $("f-duration").add(new Option(d)));
+$("f-duration").add(new Option("Other (type your own)", OTHER));
 renderCenters();
 fillForm();
 render();

@@ -276,10 +276,19 @@ function drawRsvp(ctx, url, x, top, height, second) {
   ctx.textAlign = "left";
 }
 
-/* The template's own logo, redrawn at its original size, centered vertically in the white space. */
+/* The template's own logo, redrawn at its original size, centered vertically
+   in the white space. Returns the y of the red box's top edge as drawn (its
+   position inside the crop varies a few pixels between templates). */
 function drawLogo(ctx, img, top, bottom) {
-  const g = L.logo, s = g.src;
-  ctx.drawImage(img, s.x, s.y, s.w, s.h, s.x, (top + bottom - s.h) / 2, s.w, s.h);
+  const s = L.logo.src, y = (top + bottom - s.h) / 2;
+  ctx.drawImage(img, s.x, s.y, s.w, s.h, s.x, y, s.w, s.h);
+  const d = ctx.getImageData(s.x + s.w / 2 - 40, y, 80, s.h).data; // a strip down the middle of the box
+  for (let row = 0; row < s.h; row++) {
+    for (let i = row * 80 * 4; i < (row + 1) * 80 * 4; i += 4) {
+      if (d[i] > 180 && d[i + 1] < 100 && d[i + 2] < 100) return y + row;
+    }
+  }
+  return y;
 }
 
 /* ---------- contact band ---------- */
@@ -355,7 +364,7 @@ export async function drawFlyer(canvas, state) {
 
   // repaint the whole white strip, then put the logo back
   ctx.fillStyle = C.white; ctx.fillRect(0, spaceTop, W, H - spaceTop);
-  drawLogo(ctx, img, spaceTop, spaceBottom);
+  const logoTop = drawLogo(ctx, img, spaceTop, spaceBottom);
 
   // card geometry
   const cardL = L.left, cardR = L.contentRight, cd = L.card;
@@ -397,8 +406,11 @@ export async function drawFlyer(canvas, state) {
       noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, detailsTop + contentH + L.note.gap + i * L.note.size * 1.35));
     }
     if (rsvp) {
+      // the top of the word "RSVP" lines up exactly with the top of the red logo box
+      font(ctx, 800, 21); ctx.textBaseline = "middle";
+      const ascent = ctx.measureText(TEXT.rsvp).actualBoundingBoxAscent;
       const rH = rsvpBlockHeight(state.second);
-      drawRsvp(ctx, rsvp, sessionsR, mid - rH / 2, rH, state.second);
+      drawRsvp(ctx, rsvp, sessionsR, logoTop + ascent - 13, rH, state.second); // label middle sits 13px below the block top
     }
     // thin divider between the session details (incl. RSVP) and the logo
     if (L.divider.show) {

@@ -255,10 +255,15 @@ function drawHeader(ctx, y) {
   ctx.fillStyle = TH.rule; ctx.fillRect(L.left + w + 24, y - 1, L.contentRight - (L.left + w + 24), 2);
 }
 
+/* Height of the RSVP block: label, QR tile and caption. */
+function rsvpBlockHeight(second) {
+  return 26 + 14 + L.rsvp.tile + 16 + TEXT.rsvpCaption(second).length * 24;
+}
+
 function drawRsvp(ctx, url, x, top, height, second) {
   const r = L.rsvp, cx = x + r.width / 2;
   const caption = TEXT.rsvpCaption(second);
-  const blockH = 26 + 14 + r.tile + 16 + caption.length * 24;
+  const blockH = rsvpBlockHeight(second);
   let y = top + (height - blockH) / 2;
   font(ctx, 800, 21); ctx.fillStyle = C.red; ctx.textBaseline = "middle";
   spacedText(ctx, TEXT.rsvp, cx, y + 13, 4, "center");
@@ -358,8 +363,11 @@ export async function drawFlyer(canvas, state) {
   // with the tinted box, text is inset from its edges; without it, text starts at the left margin
   const padX = cd.panel ? cd.padX : 0, padT = cd.panel ? cd.padTop : 0, padB = cd.panel ? cd.padBottom : 0;
   const innerX = cardL + padX, innerW = sessionsR - (rsvp ? cd.gapToRsvp : padX) - innerX;
+  const open = !cd.panel; // no box: details, RSVP and logo sit side by side on white
   font(ctx, 400, L.note.size, true);
-  const noteLines = note ? wrapText(ctx, note, cardR - cardL) : [];
+  // the note stays under the details, clear of the RSVP when there's no box
+  const noteW = open && rsvp ? sessionsR - cd.gapToRsvp - cardL : cardR - cardL;
+  const noteLines = note ? wrapText(ctx, note, noteW) : [];
   const noteH = note ? L.note.gap + noteLines.length * L.note.size * 1.35 : 0;
   const headH = L.header.show ? L.header.size + L.header.after : 0;
   const rsvpMinH = rsvp ? 26 + 14 + L.rsvp.tile + 16 + 2 * 24 + (cd.panel ? 40 : 8) : 0;
@@ -373,10 +381,32 @@ export async function drawFlyer(canvas, state) {
     wrapped = 0;
     contentH = cardContent(ctx, card, innerX, 0, innerW, k, false);
     // growing past normal size is only worth it if dates and times stay on one line
-    if ((cardHeight() <= maxCardH && (k <= 1 || !wrapped)) || k <= L.minScale) break;
+    const fits = open ? contentH + noteH <= bottom - top : cardHeight() <= maxCardH;
+    if ((fits && (k <= 1 || !wrapped)) || k <= L.minScale) break;
     k = Math.round((k - 0.02) * 100) / 100;
   }
   const cardH = cardHeight();
+
+  if (open) {
+    // details (with the note under them), RSVP and logo all centered on the same line
+    const mid = (spaceTop + spaceBottom) / 2;
+    const detailsTop = Math.max(top, mid - (contentH + noteH) / 2);
+    cardContent(ctx, card, innerX, detailsTop, innerW, k, true);
+    if (note) {
+      font(ctx, 400, L.note.size, true); ctx.fillStyle = C.gray; ctx.textBaseline = "top";
+      noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, detailsTop + contentH + L.note.gap + i * L.note.size * 1.35));
+    }
+    if (rsvp) {
+      const rH = rsvpBlockHeight(state.second);
+      drawRsvp(ctx, rsvp, sessionsR, mid - rH / 2, rH, state.second);
+    }
+    // thin divider between the session details (incl. RSVP) and the logo
+    const g = L.logo.src, dx = (cardR + g.x) / 2, dh = g.h - 2 * L.divider.inset;
+    ctx.fillStyle = TH.rule; ctx.fillRect(dx - 1, mid - dh / 2, 2, dh);
+    if (contact.length) drawBand(ctx, contact, W, H);
+    ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+    return;
+  }
 
   // center the whole block (header, card, note) in the white space
   const blockH = headH + cardH + noteH;

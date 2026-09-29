@@ -28,6 +28,7 @@ GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
 |---|---|
 | Event names, which template each audience uses | `js/config.js` → `EVENTS` |
 | Audiences | `js/config.js` → `AUDIENCES` |
+| City centers (link, email, registration QR link) | `js/centers.js` |
 | Add a new flyer design | Export page as PNG from Canva, save as JPG in `templates/`, add it to `EVENTS` |
 | Where things sit in the details strip | `js/config.js` → `LAYOUT` |
 | Text sizes inside the session card | `js/config.js` → `CARD_TEXT` |
@@ -47,6 +48,7 @@ All current templates are 1545 × 2000 px (Canva's US Letter PNG export) and sha
 index.html          page markup
 css/styles.css      page styles (light + dark)
 js/config.js        audiences, events, template mapping, layout, text
+js/centers.js       city centers from the City Center Information sheet
 js/state.js         saved draft, audience/event helpers, link check
 js/flyer.js         draws the template and the session details
 js/lib/canvas.js    canvas helpers (text wrapping and fitting, QR)

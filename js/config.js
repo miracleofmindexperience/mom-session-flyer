@@ -121,6 +121,7 @@ export const DEFAULTS = {
   sameLocation: true,
   location2: { venue: "", address: "" },
   note: "",
+  center: "",
   contact: { link: "", phone: "", email: "" },
   rsvp: ""
 };

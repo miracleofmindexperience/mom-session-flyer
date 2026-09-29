@@ -2,6 +2,7 @@
 import { AUDIENCES, DURATIONS, FONTS, DOWNLOAD_PREFIX } from "./config.js";
 import { loadState, saveState, defaultState, eventsFor, currentEvent, rsvpUrl } from "./state.js";
 import { drawFlyer } from "./flyer.js";
+import { CENTERS } from "./centers.js";
 
 const $ = id => document.getElementById(id);
 const canvas = $("cv");
@@ -58,10 +59,29 @@ $("prs-copy").addEventListener("click", () => {
   }, () => {});
 });
 
+/* ---------- city center ---------- */
+function renderCenters() {
+  const sel = $("f-center");
+  sel.add(new Option("Choose your city center…", ""));
+  CENTERS.forEach(c => sel.add(new Option(c.name, c.id)));
+}
+$("f-center").addEventListener("change", e => {
+  state.center = e.target.value;
+  const c = CENTERS.find(x => x.id === state.center);
+  if (c) {
+    // fill the center's details; they stay editable afterwards
+    state.contact.link = c.link; state.contact.email = c.email; state.rsvp = c.rsvp;
+    ["link", "email"].forEach(k => { $("f-" + k).value = state.contact[k]; });
+    $("f-rsvp").value = state.rsvp;
+  }
+  changed();
+});
+
 /* ---------- fields ---------- */
 function fillForm() {
   Object.entries(FIELDS).forEach(([id, path]) => { $(id).value = get(path); });
   Object.entries(CHECKS).forEach(([id, key]) => { $(id).checked = state[key]; });
+  $("f-center").value = state.center;
   renderAudiences(); renderEvents(); updateVisibility();
 }
 
@@ -124,6 +144,7 @@ $("dl").addEventListener("click", async () => {
 
 /* ---------- start ---------- */
 DURATIONS.forEach(d => $("durations").appendChild(new Option(d)));
+renderCenters();
 fillForm();
 render();
 Promise.all(FONTS.preload.map(f => document.fonts.load(f)))

@@ -255,40 +255,55 @@ function drawHeader(ctx, y) {
   ctx.fillStyle = TH.rule; ctx.fillRect(L.left + w + 24, y - 1, L.contentRight - (L.left + w + 24), 2);
 }
 
-/* Height of the RSVP block: label, QR tile and caption. */
+/* Height of the RSVP block (label, QR and caption) at its natural spacing. */
 function rsvpBlockHeight(second) {
   return 26 + L.rsvp.labelGap + L.rsvp.tile + 16 + TEXT.rsvpCaption(second).length * 24;
 }
 
-function drawRsvp(ctx, url, x, top, height, second) {
-  const r = L.rsvp, cx = x + r.width / 2;
-  const caption = TEXT.rsvpCaption(second);
-  const blockH = rsvpBlockHeight(second);
-  let y = top + (height - blockH) / 2;
-  font(ctx, 800, 21); ctx.fillStyle = C.red; ctx.textBaseline = "middle";
-  spacedText(ctx, TEXT.rsvp, cx, y + 13, 4, "center");
-  y += 26 + r.labelGap;
-  ctx.fillStyle = C.white; roundRect(ctx, cx - r.tile / 2, y, r.tile, r.tile, 14); ctx.fill();
-  drawQR(ctx, url, cx - r.qr / 2, y + (r.tile - r.qr) / 2, r.qr, TH.ink);
-  y += r.tile + 16;
-  font(ctx, 700, 19); ctx.fillStyle = TH.ink; ctx.textAlign = "center";
-  caption.forEach((ln, i) => ctx.fillText(ln, cx, y + 12 + i * 24));
+/*
+ * RSVP column: "RSVP", the QR code and the caption, fitted between `top`
+ * (where the tops of the RSVP letters go) and `bottom` (where the caption's
+ * last line sits). The QR keeps its size; the space above and below its
+ * visible square is split evenly (it shrinks only if that space runs out).
+ */
+function drawRsvp(ctx, url, x, top, bottom, second) {
+  const r = L.rsvp, cx = x + r.width / 2, caption = TEXT.rsvpCaption(second);
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+
+  font(ctx, 800, 21);
+  const labelBase = top + ctx.measureText(TEXT.rsvp).actualBoundingBoxAscent;
+  ctx.fillStyle = C.red;
+  spacedText(ctx, TEXT.rsvp, cx, labelBase, 4, "center");
+
+  font(ctx, 700, 19);
+  const lastBase = bottom, firstBase = lastBase - (caption.length - 1) * 24;
+  const captionTop = firstBase - ctx.measureText(caption[0]).actualBoundingBoxAscent;
+  ctx.fillStyle = TH.ink; ctx.textAlign = "center";
+  caption.forEach((ln, i) => ctx.fillText(ln, cx, firstBase + i * 24));
   ctx.textAlign = "left";
+
+  // QR: the visible square is n modules; drawQR adds a 2-module white margin on each side
+  const q = window.qrcode(0, "M"); q.addData(url); q.make();
+  const n = q.getModuleCount(), space = captionTop - labelBase;
+  let size = r.qr;
+  const visible = sz => sz * n / (n + 4);
+  if (space - visible(size) < 2 * r.minGap) size = (space - 2 * r.minGap) * (n + 4) / n;
+  const gap = (space - visible(size)) / 2, margin = size * 2 / (n + 4);
+  drawQR(ctx, url, cx - size / 2, labelBase + gap - margin, size, TH.ink);
 }
 
 /* The template's own logo, redrawn at its original size, centered vertically
-   in the white space. Returns the y of the red box's top edge as drawn (its
-   position inside the crop varies a few pixels between templates). */
+   in the white space. Returns the red box's top and bottom edges as drawn
+   (the box sits a few pixels differently inside each template's crop). */
 function drawLogo(ctx, img, top, bottom) {
   const s = L.logo.src, y = (top + bottom - s.h) / 2;
   ctx.drawImage(img, s.x, s.y, s.w, s.h, s.x, y, s.w, s.h);
   const d = ctx.getImageData(s.x + s.w / 2 - 40, y, 80, s.h).data; // a strip down the middle of the box
-  for (let row = 0; row < s.h; row++) {
-    for (let i = row * 80 * 4; i < (row + 1) * 80 * 4; i += 4) {
-      if (d[i] > 180 && d[i + 1] < 100 && d[i + 2] < 100) return y + row;
-    }
-  }
-  return y;
+  const red = row => { for (let i = row * 320; i < (row + 1) * 320; i += 4) if (d[i] > 180 && d[i + 1] < 100 && d[i + 2] < 100) return true; return false; };
+  let t = 0, b = s.h - 1;
+  while (t < s.h && !red(t)) t++;
+  while (b > t && !red(b)) b--;
+  return t < s.h ? { top: y + t, bottom: y + b + 1 } : { top: y, bottom: y + s.h };
 }
 
 /* ---------- contact band ---------- */
@@ -364,7 +379,7 @@ export async function drawFlyer(canvas, state) {
 
   // repaint the whole white strip, then put the logo back
   ctx.fillStyle = C.white; ctx.fillRect(0, spaceTop, W, H - spaceTop);
-  const logoTop = drawLogo(ctx, img, spaceTop, spaceBottom);
+  const logo = drawLogo(ctx, img, spaceTop, spaceBottom);
 
   // card geometry
   const cardL = L.left, cardR = L.contentRight, cd = L.card;
@@ -406,11 +421,8 @@ export async function drawFlyer(canvas, state) {
       noteLines.forEach((ln, i) => ctx.fillText(ln, cardL, detailsTop + contentH + L.note.gap + i * L.note.size * 1.35));
     }
     if (rsvp) {
-      // the top of the word "RSVP" lines up exactly with the top of the red logo box
-      font(ctx, 800, 21); ctx.textBaseline = "middle";
-      const ascent = ctx.measureText(TEXT.rsvp).actualBoundingBoxAscent;
-      const rH = rsvpBlockHeight(state.second);
-      drawRsvp(ctx, rsvp, sessionsR, logoTop + ascent - 13, rH, state.second); // label middle sits 13px below the block top
+      // the RSVP column spans the red logo box: "RSVP" on its top edge, the caption's baseline on its bottom edge
+      drawRsvp(ctx, rsvp, sessionsR, logo.top, logo.bottom, state.second);
     }
     // thin divider between the session details (incl. RSVP) and the logo
     if (L.divider.show) {
@@ -437,7 +449,7 @@ export async function drawFlyer(canvas, state) {
     ctx.strokeStyle = C.dash; ctx.lineWidth = 2; ctx.setLineDash([7, 7]);
     ctx.beginPath(); ctx.moveTo(sessionsR, cardTop + 20); ctx.lineTo(sessionsR, cardTop + cardH - 20); ctx.stroke();
     ctx.setLineDash([]);
-    drawRsvp(ctx, rsvp, sessionsR, cardTop, cardH, state.second);
+    drawRsvp(ctx, rsvp, sessionsR, cardTop + 24, cardTop + cardH - 24, state.second);
   }
 
   if (note) {

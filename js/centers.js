@@ -1,22 +1,21 @@
 /*
- * City centers, from "City Center Information for Flyer Generator.xlsx"
+ * City centers, from "City Center Information for Flyer Generator v2.xlsx"
  * (City Center Info sheet). Picking a center fills the flyer's link, email and
  * registration QR link; coordinators can still edit them. Add or fix a center here.
  */
 export const CENTERS = [
   { id: "atlanta", name: "Atlanta", link: "isha.co/atlanta", email: "atlanta@ishausa.org", rsvp: "isha.co/atlanta-free-sessions" },
   { id: "austin", name: "Austin", link: "isha.co/austin", email: "austin@ishausa.org", rsvp: "isha.co/austin-free-sessions" },
-  { id: "boston", name: "Boston", link: "isha.co/boston", email: "boston@ishausa.org", rsvp: "isha.co/boston-free-sessions" },
+  { id: "boston", name: "Boston (New England)", link: "isha.us/newengland", email: "boston@ishausa.org", rsvp: "isha.us/newengland" },
   { id: "calgary", name: "Calgary", link: "isha.co/calgary", email: "calgary@ishausa.org", rsvp: "isha.co/calgary-free-sessions" },
   { id: "charlotte", name: "Charlotte", link: "isha.co/charlotte", email: "charlotte@ishausa.org", rsvp: "isha.co/charlotte-free-sessions" },
   { id: "chicago", name: "Chicago", link: "isha.co/chicago", email: "chicago@ishausa.org", rsvp: "isha.co/chicago-free-sessions" },
   { id: "cincinnati", name: "Cincinnati", link: "isha.co/cincinnati", email: "cincinnati@ishausa.org", rsvp: "isha.co/cincinnati-free-sessions" },
   { id: "cleveland", name: "Cleveland", link: "isha.co/cleveland", email: "cleveland@ishausa.org", rsvp: "isha.co/cleveland-free-sessions" },
   { id: "columbus", name: "Columbus", link: "isha.co/columbus", email: "columbus@ishausa.org", rsvp: "isha.co/columbus-free-sessions" },
-  { id: "connecticut", name: "Connecticut", link: "isha.co/connecticut", email: "connecticut@ishausa.org", rsvp: "isha.co/connecticut-free-sessions" },
+  { id: "connecticut", name: "Connecticut (Hartford)", link: "isha.us/hartford", email: "ct@ishausa.org", rsvp: "isha.us/hartford" },
   { id: "dallas", name: "Dallas", link: "isha.co/dallas", email: "dallas@ishausa.org", rsvp: "isha.co/dallas-free-sessions" },
   { id: "dayton", name: "Dayton", link: "isha.co/dayton", email: "dayton@ishausa.org", rsvp: "isha.co/dayton-free-sessions" },
-  { id: "delaware", name: "Delaware", link: "isha.co/delaware", email: "delaware@ishausa.org", rsvp: "isha.co/delaware-free-sessions" },
   { id: "denver", name: "Denver", link: "isha.co/denver", email: "denver@ishausa.org", rsvp: "isha.co/denver-free-sessions" },
   { id: "detroit", name: "Detroit", link: "isha.co/detroit", email: "detroit@ishausa.org", rsvp: "isha.co/detroit-free-sessions" },
   { id: "edmonton", name: "Edmonton", link: "isha.co/edmonton", email: "edmonton@ishausa.org", rsvp: "isha.co/edmonton-free-sessions" },
@@ -26,7 +25,6 @@ export const CENTERS = [
   { id: "losangeles", name: "Los Angeles", link: "isha.co/losangeles", email: "losangeles@ishausa.org", rsvp: "isha.co/losangeles-free-sessions" },
   { id: "louisville", name: "Louisville", link: "isha.co/louisville", email: "louisville@ishausa.org", rsvp: "isha.co/louisville-free-sessions" },
   { id: "maryland", name: "Maryland", link: "isha.co/maryland", email: "maryland@ishausa.org", rsvp: "isha.co/maryland-free-sessions" },
-  { id: "mcminnville", name: "McMinnville", link: "isha.co/mcminnville", email: "mcminnville@ishausa.org", rsvp: "isha.co/mcminnville-free-sessions" },
   { id: "memphis", name: "Memphis", link: "isha.co/memphis", email: "memphis@ishausa.org", rsvp: "isha.co/memphis-free-sessions" },
   { id: "milwaukee", name: "Milwaukee", link: "isha.co/milwaukee", email: "milwaukee@ishausa.org", rsvp: "isha.co/milwaukee-free-sessions" },
   { id: "minneapolis", name: "Minneapolis", link: "isha.co/minneapolis", email: "minneapolis@ishausa.org", rsvp: "isha.co/minneapolis-free-sessions" },
@@ -50,7 +48,6 @@ export const CENTERS = [
   { id: "saltlakecity", name: "Salt Lake City", link: "isha.co/saltlakecity", email: "saltlakecity@ishausa.org", rsvp: "isha.co/saltlakecity-free-sessions" },
   { id: "sanantonio", name: "San Antonio", link: "isha.co/sanantonio", email: "sanantonio@ishausa.org", rsvp: "isha.co/sanantonio-free-sessions" },
   { id: "sandiego", name: "San Diego", link: "isha.co/sandiego", email: "sandiego@ishausa.org", rsvp: "isha.co/sandiego-free-sessions" },
-  { id: "sfcity", name: "San Francisco (City)", link: "isha.co/sfcity", email: "sfcity@ishausa.org", rsvp: "isha.co/sfcity-free-sessions" },
   { id: "santabarbara", name: "Santa Barbara", link: "isha.co/santabarbara", email: "santabarbara@ishausa.org", rsvp: "isha.co/santabarbara-free-sessions" },
   { id: "santafe", name: "Santa Fe", link: "isha.co/santafe", email: "santafe@ishausa.org", rsvp: "isha.co/santafe-free-sessions" },
   { id: "sarasota", name: "Sarasota", link: "isha.co/sarasota", email: "sarasota@ishausa.org", rsvp: "isha.co/sarasota-free-sessions" },

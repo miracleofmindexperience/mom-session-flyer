@@ -13,24 +13,40 @@ export const AUDIENCES = {
 
 /*
  * Event names from the MoM Sessions one-pager. `name` is also the PRS
- * "Event Name". `templates` maps audience -> image in templates/ (without
- * .jpg). An audience missing here doesn't offer that event.
+ * "Event Name". Each "in 7 minutes" event has a shorter-headline version
+ * right after it (for longer sessions that include other practices).
+ * `templates` maps audience -> image in templates/ (without .jpg). An
+ * audience missing here doesn't offer that event.
  */
 export const EVENTS = [
   { id: "stress", name: "How to manage stress in 7 minutes",
     templates: { corporate: "corporate-1", medical: "medical-1", student: "corporate-1", community: "corporate-1" } },
+  { id: "stress-short", name: "How to manage stress",
+    templates: { corporate: "corporate-1-short", medical: "medical-1-short", student: "corporate-1-short", community: "corporate-1-short" } },
   { id: "brain-fog", name: "How to clear brain fog in 7 minutes",
     templates: { corporate: "corporate-2", student: "student-2" } },
+  { id: "brain-fog-short", name: "How to clear brain fog",
+    templates: { corporate: "corporate-2-short", student: "student-2-short" } },
   { id: "focus", name: "How to boost your focus in 7 minutes",
     templates: { corporate: "corporate-3" } },
+  { id: "focus-short", name: "How to boost your focus",
+    templates: { corporate: "corporate-3-short" } },
   { id: "flow", name: "Enter a flow state in 7 minutes",
     templates: { student: "student-4" } },
+  { id: "flow-short", name: "Enter a flow state",
+    templates: { student: "student-4-short" } },
   { id: "lock-in", name: "7 minutes to lock in",
     templates: { student: "student-5" } },
+  { id: "lock-in-short", name: "How to lock in",
+    templates: { student: "student-5-short" } },
   { id: "overstimulation", name: "Reset from overstimulation in 7 minutes",
     templates: { medical: "medical-6", student: "student-6" } },
+  { id: "overstimulation-short", name: "Reset from overstimulation",
+    templates: { medical: "medical-6-short", student: "student-6-short" } },
   { id: "relieve-stress", name: "How to relieve stress in 7 minutes",
     templates: { medical: "medical-7", community: "medical-7" } },
+  { id: "relieve-stress-short", name: "How to relieve stress",
+    templates: { medical: "medical-7-short", community: "medical-7-short" } },
   { id: "burnout", name: "The way out of burnout starts here",
     templates: { medical: "medical-8" } }
 ];

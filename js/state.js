@@ -1,4 +1,4 @@
-import { STORAGE_KEY, DEFAULTS, EVENTS, AUDIENCES } from "./config.js";
+import { STORAGE_KEY, DEFAULTS, EVENTS, AUDIENCES, DURATIONS, ALLOW_OTHER_DURATION, SHOW_SHORT_HEADLINES } from "./config.js";
 
 /* Saved draft merged over the defaults, so drafts from older versions still load. */
 export function loadState() {
@@ -23,15 +23,29 @@ function merge(base, extra) {
   return base;
 }
 
-/* Keeps audience and event valid together. */
+/* Keeps audience, event and duration valid. */
 function normalize(s) {
   if (!AUDIENCES[s.audience]) s.audience = DEFAULTS.audience;
-  if (!eventsFor(s.audience).some(e => e.id === s.eventId)) s.eventId = eventsFor(s.audience)[0].id;
+  const events = eventsFor(s.audience);
+  if (!events.some(e => e.id === s.eventId)) {
+    // a hidden shorter-headline choice falls back to its "in 7 minutes" version
+    const full = s.eventId.replace(/-short$/, "");
+    s.eventId = events.some(e => e.id === full) ? full : events[0].id;
+  }
+  if (!ALLOW_OTHER_DURATION && !DURATIONS.includes(s.duration)) s.duration = closestDuration(s.duration);
   return s;
 }
 
+/* The listed duration nearest to a typed one ("90 minutes" -> "60 minutes"). */
+function closestDuration(text) {
+  const m = String(text).match(/\d+(\.\d+)?/);
+  if (!m) return DEFAULTS.duration;
+  const mins = parseFloat(m[0]) * (/h(ou)?r/i.test(text) ? 60 : 1);
+  return DURATIONS.reduce((best, d) => Math.abs(parseInt(d) - mins) < Math.abs(parseInt(best) - mins) ? d : best);
+}
+
 export function eventsFor(audience) {
-  return EVENTS.filter(e => e.templates[audience]);
+  return EVENTS.filter(e => e.templates[audience] && (SHOW_SHORT_HEADLINES || !e.id.endsWith("-short")));
 }
 
 export function currentEvent(state) {

@@ -1,5 +1,5 @@
 /* Wires the form, the live preview and the download button together. */
-import { AUDIENCES, DURATIONS, FONTS, DOWNLOAD_PREFIX } from "./config.js";
+import { AUDIENCES, DURATIONS, FONTS, DOWNLOAD_PREFIX, ALLOW_OTHER_DURATION } from "./config.js";
 import { loadState, saveState, defaultState, eventsFor, currentEvent, rsvpUrl } from "./state.js";
 import { drawFlyer } from "./flyer.js";
 import { CENTERS } from "./centers.js";
@@ -160,7 +160,7 @@ $("dl").addEventListener("click", async () => {
 
 /* ---------- start ---------- */
 DURATIONS.forEach(d => $("f-duration").add(new Option(d)));
-$("f-duration").add(new Option("Other (type your own)", OTHER));
+if (ALLOW_OTHER_DURATION) $("f-duration").add(new Option("Other (type your own)", OTHER));
 renderCenters();
 fillForm();
 render();

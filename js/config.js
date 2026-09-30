@@ -60,8 +60,18 @@ export const TEMPLATE_VERSION = 2;
    is blank). Cut from the PR team's Canva export. */
 export const LOGO_SRC = "assets/mom-logo.png";
 
-/* Session durations in the dropdown (the MoM session modules); "Other" allows any text. */
+/* Session durations in the dropdown (the MoM session modules). */
 export const DURATIONS = ["30 minutes", "45 minutes", "60 minutes"];
+/* "Other (type your own)" duration. Off: sessions are 60 minutes at most
+   (PR team request, Sep 2026). Drafts with other durations move to the
+   closest option above. */
+export const ALLOW_OTHER_DURATION = false;
+
+/* Shorter-headline flyers (the "-short" events below). Off during the PR
+   team's 2-week test of the "in 7 minutes" versions (from Sep 30, 2026);
+   set back to true to offer both again. Burnout has no 7-minute version,
+   so it stays either way. */
+export const SHOW_SHORT_HEADLINES = false;
 
 /*
  * The details area, in template pixels (all templates are 1545 x 2000 and

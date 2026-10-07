@@ -33,6 +33,7 @@ function normalize(s) {
     s.eventId = events.some(e => e.id === full) ? full : events[0].id;
   }
   if (!ALLOW_OTHER_DURATION && !DURATIONS.includes(s.duration)) s.duration = closestDuration(s.duration);
+  if (s.s2.duration && !DURATIONS.includes(s.s2.duration)) s.s2.duration = closestDuration(s.s2.duration);
   return s;
 }
 

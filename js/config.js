@@ -151,7 +151,7 @@ export const DEFAULTS = {
   s1: { date: "Sun, Oct 11, 2026", time: "2:00 to 2:30 PM" },
   location: { venue: "Main Street Library", address: "123 Main St,\nYour City, ST 12345" },
   second: false,
-  s2: { date: "", time: "" },
+  s2: { date: "", time: "", duration: "" }, // duration "" = same as session 1
   sameLocation: true,
   location2: { venue: "", address: "" },
   note: "",

@@ -12,7 +12,7 @@ let state = loadState();
 const FIELDS = {
   "f-s1-date": "s1.date", "f-s1-time": "s1.time",
   "f-venue": "location.venue", "f-address": "location.address",
-  "f-s2-date": "s2.date", "f-s2-time": "s2.time",
+  "f-s2-date": "s2.date", "f-s2-time": "s2.time", "f-s2-duration": "s2.duration",
   "f-venue2": "location2.venue", "f-address2": "location2.address",
   "f-note": "note",
   "f-link": "contact.link", "f-phone": "contact.phone", "f-email": "contact.email",
@@ -160,6 +160,8 @@ $("dl").addEventListener("click", async () => {
 
 /* ---------- start ---------- */
 DURATIONS.forEach(d => $("f-duration").add(new Option(d)));
+$("f-s2-duration").add(new Option("Same as session 1", ""));
+DURATIONS.forEach(d => $("f-s2-duration").add(new Option(d)));
 if (ALLOW_OTHER_DURATION) $("f-duration").add(new Option("Other (type your own)", OTHER));
 renderCenters();
 fillForm();

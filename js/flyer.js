@@ -145,7 +145,7 @@ function buildCard(state) {
     if (!loc1.length) return { cols: [when], footer: [] };
     return { cols: [when, [{ type: "label", text: TEXT.location }, ...loc1]], footer: [] };
   }
-  const s1 = sessionItems(TEXT.session(1), state.s1, d), s2 = sessionItems(TEXT.session(2), state.s2, d);
+  const s1 = sessionItems(TEXT.session(1), state.s1, d), s2 = sessionItems(TEXT.session(2), state.s2, state.s2.duration || d);
   // one shared location spans both columns under the two sessions
   if (state.sameLocation) {
     const place = placeItem(state.location);
